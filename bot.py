@@ -29,6 +29,8 @@ FILE_NAME = 'prices.txt'
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 def fetch_and_save_price():
+    print("Начинаю проверку цены на сайте...", flush=True)
+    
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
@@ -41,27 +43,36 @@ def fetch_and_save_price():
         
         if price_element:
             price = price_element[0].text_content().strip()
+            print(f"Цена успешно найдена: {price}", flush=True)
         else:
             price = "Цена не найдена"
+            print("Внимание: Элемент с ценой не найден по XPATH!", flush=True)
+            
     except Exception as e:
         price = f"Ошибка парсинга: {e}"
+        print(f"Произошла ошибка при загрузке страницы: {e}", flush=True)
 
-    # --- ИЗМЕНЕНИЯ ЗДЕСЬ ---
     msk_tz = timezone(timedelta(hours=3))
     now = datetime.now(msk_tz)
     
     date_str = now.strftime('%d.%m.%Y')
     time_str = now.strftime('%H:%M:%S')
     log_entry = f"{date_str} / {time_str} МСК / {price}\n"
-    # -----------------------
     
+    # Сохраняем в файл
     with open(FILE_NAME, 'a', encoding='utf-8') as file:
         file.write(log_entry)
+        print("Данные записаны в файл prices.txt", flush=True)
         
+    # Отправляем в Telegram
     try:
         bot.send_message(CHAT_ID, f"🕒 Автоматическая проверка:\n{log_entry.strip()}")
+        print("Уведомление успешно отправлено в Telegram.", flush=True)
     except Exception as e:
-        print(f"Ошибка отправки в Telegram: {e}")
+        print(f"Ошибка отправки сообщения в Telegram: {e}", flush=True)
+        
+    print("-" * 30, flush=True)
+
 
 
 def run_schedule():
