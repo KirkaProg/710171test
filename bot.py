@@ -6,6 +6,7 @@ import requests
 from lxml import html
 import schedule
 import telebot
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # Убираем load_dotenv(), чтобы скрипт смотрел только в настройки хостинга!
 
@@ -86,13 +87,32 @@ def send_file(message):
     except FileNotFoundError:
         bot.reply_to(message, "Файл еще не создан.")
 
+def run_dummy_server():
+    # Bothost обычно передает нужный порт в переменной окружения PORT, либо используем 8080
+    port = int(os.environ.get("PORT", 8080))
+    class DummyHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Bot is alive!")
+        # Отключаем вывод логов сервера, чтобы не спамить
+        def log_message(self, format, *args):
+            pass
+            
+    server = HTTPServer(('0.0.0.0', port), DummyHandler)
+    server.serve_forever()
+
 if __name__ == '__main__':
-    # На Bothost print() выводится в раздел "Логи"
-    print("Запуск планировщика задач...")
+    # Запускаем веб-сервер-заглушку для хостинга
+    threading.Thread(target=run_dummy_server, daemon=True).start()
+    
+    # Запускаем планировщик задач
     scheduler_thread = threading.Thread(target=run_schedule, daemon=True)
     scheduler_thread.start()
     
+    # Делаем первую проверку
     fetch_and_save_price()
     
     print("Бот успешно запущен и готов к работе!")
     bot.polling(none_stop=True)
+
