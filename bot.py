@@ -2,22 +2,24 @@ import os
 import time
 import threading
 from datetime import datetime
-
 import requests
 from lxml import html
 import schedule
 import telebot
-from dotenv import load_dotenv
 
-# Пытаемся загрузить .env, если он есть (для локального тестирования). 
-# На хостинге Bothost эти переменные будут браться из настроек панели.
-load_dotenv()
+# Убираем load_dotenv(), чтобы скрипт смотрел только в настройки хостинга!
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
 
+# Добавим вывод в логи Bothost, чтобы вы точно видели, дошли ли данные
+print("--- ОТЛАДКА ---")
+print(f"Токен получен: {TELEGRAM_TOKEN is not None}")
+print(f"Chat ID получен: {CHAT_ID is not None}")
+print("---------------")
+
 if not TELEGRAM_TOKEN or not CHAT_ID:
-    raise ValueError("Ошибка: Не заданы TELEGRAM_TOKEN или CHAT_ID в переменных окружения")
+    raise ValueError("Ошибка: Хостинг не передал переменные TELEGRAM_TOKEN или CHAT_ID")
 
 URL = 'https://lab-store071.ru/catalog/kupit-makbuk-v-tule/'
 XPATH_PRICE = '//*[@id="bx_1847241719_488"]/a/div[1]/span[2]'
