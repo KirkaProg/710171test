@@ -45,11 +45,15 @@ def fetch_and_save_price():
     except Exception as e:
         price = f"Ошибка парсинга: {e}"
 
+    # --- ИЗМЕНЕНИЯ ЗДЕСЬ ---
     msk_tz = timezone(timedelta(hours=3))
     now = datetime.now(msk_tz)
-    log_entry = f"{now.strftime('%d.%m.%Y')} / {now.strftime('%H:%M:%S')} / {price}\n"
     
-    # Сохраняем в файл внутри контейнера
+    date_str = now.strftime('%d.%m.%Y')
+    time_str = now.strftime('%H:%M:%S')
+    log_entry = f"{date_str} / {time_str} / {price}\n"
+    # -----------------------
+    
     with open(FILE_NAME, 'a', encoding='utf-8') as file:
         file.write(log_entry)
         
@@ -57,6 +61,7 @@ def fetch_and_save_price():
         bot.send_message(CHAT_ID, f"🕒 Автоматическая проверка:\n{log_entry.strip()}")
     except Exception as e:
         print(f"Ошибка отправки в Telegram: {e}")
+
 
 def run_schedule():
     schedule.every(1).hours.do(fetch_and_save_price)
