@@ -51,7 +51,7 @@ def fetch_and_save_price():
     
     date_str = now.strftime('%d.%m.%Y')
     time_str = now.strftime('%H:%M:%S')
-    log_entry = f"{date_str} / {time_str} / {price}\n"
+    log_entry = f"{date_str} / {time_str} МСК / {price}\n"
     # -----------------------
     
     with open(FILE_NAME, 'a', encoding='utf-8') as file:
