@@ -1,7 +1,7 @@
 import os
 import time
 import threading
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import requests
 from lxml import html
 import schedule
@@ -45,7 +45,8 @@ def fetch_and_save_price():
     except Exception as e:
         price = f"Ошибка парсинга: {e}"
 
-    now = datetime.now()
+    msk_tz = timezone(timedelta(hours=3))
+    now = datetime.now(msk_tz)
     log_entry = f"{now.strftime('%d.%m.%Y')} / {now.strftime('%H:%M:%S')} / {price}\n"
     
     # Сохраняем в файл внутри контейнера
