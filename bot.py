@@ -84,20 +84,23 @@ def run_schedule():
 # --- Команды бота ---
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    # Создаем клавиатуру, resize_keyboard=True делает кнопки компактными
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    
-    # Создаем сами кнопки
+    bot.reply_to(
+        message, 
+        "Привет! Я бот для парсинга цен. Выберите действие в меню ниже:"
+    )
+
+@bot.message_handler(commands=['keys'])
+def send_keys(message):
+
     btn_check = types.KeyboardButton('🔍 Проверить цену')
     btn_file = types.KeyboardButton('📄 Скачать историю')
     
-    # Добавляем их в клавиатуру (в один ряд)
     markup.add(btn_check, btn_file)
-    
-    # Отправляем приветствие вместе с клавиатурой
+
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     bot.reply_to(
-        message, 
-        "Привет! Я бот для парсинга цен. Выберите действие в меню ниже:", 
+        message,
+        "Добавляю клавиатуру",
         reply_markup=markup
     )
 
