@@ -92,13 +92,13 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['keys'])
 def send_keys(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     btn_check = types.KeyboardButton('🔍 Проверить цену')
     btn_file = types.KeyboardButton('📄 Скачать историю')
     
     markup.add(btn_check, btn_file)
 
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     bot.reply_to(
         message,
         "Добавляю клавиатуру",
