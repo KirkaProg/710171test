@@ -85,9 +85,18 @@ def run_schedule():
 # --- Команды бота ---
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+
+    btn_check = types.KeyboardButton('🔍 Проверить цену')
+    btn_file = types.KeyboardButton('📄 Скачать историю')
+    
+    markup.add(btn_check, btn_file)
+    
     bot.reply_to(
         message, 
-        "Привет! Я бот для парсинга цен. Выберите действие в меню ниже:"
+        "Привет! Я бот для парсинга цен.",
+        reply_markup=markup
+
     )
 
 @bot.message_handler(commands=['keys'])
