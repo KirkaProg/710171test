@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 import requests
 from lxml import html
 import schedule
-import telebot
+from telebot import types
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # Убираем load_dotenv(), чтобы скрипт смотрел только в настройки хостинга!
@@ -81,9 +81,25 @@ def run_schedule():
         schedule.run_pending()
         time.sleep(1)
 
+# --- Команды бота ---
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "Привет! Бот работает на Bothost.\n/check - проверить цену\n/file - скачать историю")
+    # Создаем клавиатуру, resize_keyboard=True делает кнопки компактными
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    
+    # Создаем сами кнопки
+    btn_check = types.KeyboardButton('🔍 Проверить цену')
+    btn_file = types.KeyboardButton('📄 Скачать историю')
+    
+    # Добавляем их в клавиатуру (в один ряд)
+    markup.add(btn_check, btn_file)
+    
+    # Отправляем приветствие вместе с клавиатурой
+    bot.reply_to(
+        message, 
+        "Привет! Я бот для парсинга цен. Выберите действие в меню ниже:", 
+        reply_markup=markup
+    )
 
 @bot.message_handler(commands=['check'])
 def manual_check(message):
@@ -96,7 +112,15 @@ def send_file(message):
         with open(FILE_NAME, 'rb') as file:
             bot.send_document(message.chat.id, file)
     except FileNotFoundError:
-        bot.reply_to(message, "Файл еще не создан.")
+        bot.reply_to(message, "Файл еще не создан (не было ни одной проверки).")
+
+# Обработчик нажатий на текстовые кнопки
+@bot.message_handler(content_types=['text'])
+def handle_text_buttons(message):
+    if message.text == '🔍 Проверить цену':
+        manual_check(message)
+    elif message.text == '📄 Скачать историю':
+        send_file(message)
 
 def run_dummy_server():
     # Bothost обычно передает нужный порт в переменной окружения PORT, либо используем 8080
